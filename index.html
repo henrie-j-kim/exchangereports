@@ -24,33 +24,25 @@
 	<h1 class="main_logo_eng"></h1>
 	-->
 </div>
+	<button onclick="downloadDocument()">Download Document</button>
+	<script>
+        // 문서 다운로드 함수
+        function downloadDocument() {
+            var documentPath = 'path/to/your/document.doc';
+            var link = document.createElement('a');
+            // 링크 속성 설정
+            link.href = documentPath;
+            link.download = 'document.doc'; // 다운로드될 파일 이름
 
-<div id="main_container">
-	<!--login_form-->
-	<div class="form-floating mb-3">
-		<input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-		<label for="floatingInput">Email address</label>
-	</div>
-	<div class="form-floating">
-		<input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-		<label for="floatingPassword">Password</label>
-	</div>
-	<!--//login_form-->
-	<div class="input-group mb-3">
-		<span class="input-group-text">국가</span>
-		<div class="form-floating">
-			<input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
-			<label for="floatingInputGroup1">Which country?</label>
-		</div>
-	</div>
-	<div class="input-group mb-3">
-		<span class="input-group-text">학교명</span>
-		<div class="form-floating">
-			<input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
-			<label for="floatingInputGroup1">Which university?</label>
-		</div>
-	</div>
-	<button type="button" class="btn btn-primary">Subscribe</button>
+            // 문서를 다운로드하기 위해 클릭 이벤트 발생
+            document.body.appendChild(link);
+            link.click();
+
+            // 가상 링크 제거
+            document.body.removeChild(link);
+        }
+    </script>
+
 
 
 
