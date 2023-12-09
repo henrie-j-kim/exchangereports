@@ -1,11 +1,827 @@
-<!doctype html>
-<html>
-    <head>
-        <title>example 1-2</title>
-    </head>
-    <body>
-        <H2>example 1-2</H2>
-        <HR>
-        example 1-2
-    </body>
+<!Doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/thml; chartset=utf-8">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link rel="shortcut icon" href="https://www.skku.edu/_res/skku/img/common/favicon.png">
+	<link rel="stylesheet" href="/resources/css/login.css" type="text/css">
+	<link rel="stylesheet" href="/resources/css/login-modal-alert.css">
+	<script type="text/javascript" src="/resources/js/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="/resources/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/resources/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/resources/js/jquery.serialize-object.min.js"></script>
+	<script type="text/javascript" src="/resources/js/common.js"></script>
+	<script type="text/javascript" src="/resources/js/login.js"></script>
+	<title>성균관대학교 로그인</title>
+</head>
+<body>
+<div id="Wrap">
+
+<div id="main_header">
+	<h1 class="main_logo"></h1>
+	<!--영문로고
+	<h1 class="main_logo_eng"></h1>
+	-->
+</div>
+
+<div id="main_container">
+	<!--login_form-->
+	<form method="POST" action="loginAction" name="LoginForm" id="LoginForm">
+	<div class="login_form">
+		<ul class="lang_chk chk_radio">
+			<li>
+				<input type="radio" id="ko" value="ko" name="lang" checked />
+				<label for="ko" class="sp_img">Korean</label>
+			</li>
+			<li>
+				<input type="radio" id="en" value="en" name="lang" />
+				<label for="en" class="sp_img">English</label>
+			</li>
+		</ul>
+		<div class="login_area">
+			<div class="id_area">
+				<label for="userid" class="sp_img">아이디</label>
+				<input type="text" id="userid" name="userid" placeholder="아이디를 입력하세요." />
+			</div>
+			<div class="pw_area"><label for="userpw" class="sp_img">비밀번호</label>
+				<input type="password" id="userpwd" name="userpwd" placeholder="비밀번호를 입력하세요." />
+			</div>
+			<div class="login_chk login_chk input_sp_img">
+				<input type="checkbox" id="saveid" name="saveid"/>
+				<label for="saveid" class="sp_img">ID 저장</label>
+			</div>
+		</div>
+		<button type="button" id="loginBtn" class="login_btn" onClick="loginBtnClick()">
+			<span>로그인</span>
+		</button>
+		<!--p style="margin: 0 0 20px 0; text-align: center; color: #FF5722; line-height: 150%;">로그인 오류시에는 모든 브라우저 창을 닫으시고,<br/>새 창에서   http://eportal.skku.edu 로 접속하시면 됩니다.</p-->
+	</div>
+	</form>
+	<!--//login_form-->
+	<!--login_info-->
+	<ul class="login_info">
+		<li><a href="javascript:fnInsertPage()">성균인 가입</a></li>
+		<li><a href="javascript:fnFindPage()">ID 찾기</a></li>
+		<li><a href="javascript:fnPWFindPage()">비밀번호 찾기</a></li>
+		<li><a href="javascript:fnRetire()">회원탈퇴</a></li>
+	</ul>
+	<p class="main_help help_tooltip"><a href="/faq/list" target="_blank" class="sp_img">로그인 도움말</a></p>
+	<!--//login_info-->
+</div>
+
+<!--footer-->
+<div id="footer">
+	<ul>
+		<li>IT콜센터 TEL <span class="blue_txt regular">031-299-6119</span></li>
+		<li>E-Mail <span class="blue_txt regular">itservice@skku.edu</span></li>
+	</ul>
+	<p class="copyright">COPYRIGHT ⓒ <span>SUNGKYUNKWAN UNIVERSITY</span> ALL RIGHTS RESERVED. Contact us</p>
+</div>
+<!--//footer-->
+
+<!--modal-->
+<!--
+<div class="modale opened" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-header">
+			<h2>Please Login</h2>
+			<a href="#" class="btn-close closemodale" aria-hidden="true">×</a>
+		</div>
+		<div class="modal-body">회원정보가 일치하지 않습니다.</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" id="btn_ingresar">확인</a>
+		</div>
+	</div>
+</div>
+-->
+<!--//modal-->
+
+</div>
+</body>
+
+
+
+<!-- Modal Alert Popup -->
+<div id="defaultalert" class="modale" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-box">
+			<div class="modal-header">
+				<h2>안내</h2>
+				<a href="#" class="btn-close closemodale" aria-hidden="true">&times;</a>
+			</div>
+			<div id="defaultmodalbody" class="modal-body"></div>
+			<div class="sso-code"></div>
+			<div class="modal-footer">
+				<a href="#" class="btn" id="btn_ingresar">확인</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal Alert Popup -->
+
+<!--modal_비밀번호 사용기한 만료(안내)-->
+<div id="expiredpwdalert" class="modale" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-box">
+			<div class="modal-header">
+				<h4>비밀번호 사용기한 만료 안내</h4>
+				
+			</div>
+			<div class="modal-body">
+				<ul class="ul-type01">
+					<li> 1) 비밀번호 변경 후 <span class="red_txt"><span id="pwdpastday"></span>일</span> 경과<br/>(포털 우측 상단) 내정보 홈에서 비밀번호를 변경하여 주시기 바랍니다.</li>
+					<li> 2) 비밀번호 변경 후 <span class="red_txt">365일</span> 초과 시 로그인 불가<br/>남은 기간 : <span class="blue_txt"><span id="pwdremainday"></span>일</span></li>
+				</ul>
+				<div class="ul-info">
+					<p class="regular">문의사항</p>
+					<ul>
+						<li>031-299-6119(내선 6119)</li>
+						<li>itservice@skku.edu</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:expireMsgAlertBtnClick()" class="btn" id="expiredpwdalertBtn">확인</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!--//modal_3-->
+
+
+
+<!--modal_비밀번호 사용기한 만료(비밀번호 변경)-->
+<div id="passwordchange" class="modale" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-box">
+			<div class="modal-header">
+				<h4>비밀번호 사용기한 만료 안내</h4>
+				<a href="#" class="btn-close closemodale" aria-hidden="true">×</a>
+			</div>
+			<div class="modal-body">
+				<p class="txt_l">비밀번호 변경 후 <span class="red_txt"><span id="pwdchgpastday"></span>일</span> 경과<br/>
+				새로운 비밀번호를 설정해 주시기 바랍니다.<br/>
+				※ 영문/숫자/특수문자 3가지 조합 8자리 이상 혹은 영문/숫자/특수문자 2가지 조합 10자리 이상 <br />※ 아이디 포함 금지</p>
+				<ul class="ul-type02 input_box">
+				<form id="pwdChangeForm" name="pwdChangeForm" method="POST">
+					<li>
+						<span class="title">현재 비밀번호</span>
+						<span class="int_cont"><input name="userPasswd" type="password" alt="현재 비밀번호 입력" title="현재 비밀번호 입력" maxLength="20" /></span>
+					</li>
+					<li>
+						<span class="title">새 비밀번호</span>
+						<span class="int_cont"><input name="newUserPasswd" type="password" alt="현재 비밀번호 입력" title="현재 비밀번호 입력" maxLength="20" /></span>
+					</li>
+					<li>
+						<span class="title">새 비밀번호 확인</span>
+						<span class="int_cont"><input name="newReUserPasswd" type="password" alt="현재 비밀번호 입력" title="현재 비밀번호 입력" maxLength="20" /></span>
+					</li>
+				</form>
+				</ul>
+				<div class="ul-info">
+					<p class="regular">문의사항</p>
+					<ul>
+						<li>031-299-6119(내선 6119)</li>
+						<li>itservice@skku.edu</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="javascript:pwdChangeBtnClick()" class="btn" id="pwdchangealertBtn">확인</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!--//modal_3-->
+
+<!--modal_비밀번호 입력 기준 초과-->
+<div id="toomaytryalert" class="modale" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-box">
+			<div class="modal-header">
+				<h4>비밀번호 입력 신호 기준치 초과</h4>
+				<a href="#" class="btn-close closemodale" aria-hidden="true">×</a>
+			</div>
+			<div class="modal-body">
+				<p><span class="green_txt">10분 후</span> 다시 시도 할 수 있습니다.</p>
+				<div class="ul-info">
+					<p class="regular">문의사항</p>
+					<ul>
+						<li>031-299-6119(내선 6119)</li>
+						<li>itservice@skku.edu</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" id="btn_ingresar">확인</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!--//modal_3-->
+
+<!--modal_해외 로그인 차단-->
+<div id="overseaalert" class="modale" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-box">
+			<div class="modal-header">
+				<h4>해외 로그인 차단</h4>
+				<a href="#" class="btn-close closemodale" aria-hidden="true">×</a>
+			</div>
+			<div class="modal-body">
+				<p>본 계정은 이용자에 의해서<br/>해외 로그인 차단으로 설정되었습니다.</p>
+				<p>(차단/해제 설정 : 포털 > (우측 상단) 내정보)</p>
+				<div class="ul-info">
+					<p class="regular">문의사항</p>
+					<ul>
+						<li>031-299-6119(내선 6119)</li>
+						<li>itservice@skku.edu</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" id="btn_ingresar">확인</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!--//modal_3-->
+
+<script type="text/javascript">
+
+var errMsgCommon = '로그인에 실패하였습니다.<br/>관리자에게 문의하세요.<br/>☎ 031-299-6119(내선 6119)<br/>▶ itservice@skku.edu<br/>';
+var errMsg0002 = '회원정보가 일치하지 않습니다.';
+var errMsg0003 = '회원정보가 일치하지 않습니다.';
+var errMsg0007 = '이미 로그인 되어 있습니다.';
+var errMsg0010 = '해외에서는 접속하실 수 없습니다.';
+var errMsg0011 = '로그인 시도 실패 누적으로 계정이 잠겼습니다.<br/>일정시간(10분) 경과 후 다시 시도 바랍니다.<br/><br/>☎ 031-299-6119(내선 6119)';
+var errMsg0012 = '로그인 시도 실패 누적으로 계정이 잠겼습니다.<br/>일정시간(10분) 경과 후 다시 시도 바랍니다.<br/><br/>☎ 031-299-6119(내선 6119)';
+var errMsg0015 = '세션이 만료되었습니다.';
+var errMsg0016 = '패스워드의 유효기간이 만료되었습니다.';
+
+$('#userid').on('keypress', function(e) {
+	if (e.keyCode == 13) {
+		loginBtnClick();
+	}
+});
+
+$('#userpwd').on('keypress', function(e) {
+	if (e.keyCode == 13) {
+		loginBtnClick();
+	}
+});
+
+$('.closemodale, #btn_ingresar').click(function (e) {
+//	 $('#userid').val('');
+	 $('#userpwd').val('');
+	 $('#userpwd').focus();
+	 e.preventDefault();
+	 $('#defaultalert').removeClass('opened');
+});
+
+$('#passwordchange .btn-close').click(function (e) {
+	e.preventDefault();
+	 $('input[name="userPasswd"]').val('');
+	 $('input[name="newUserPasswd"]').val('');
+	 $('input[name="newReUserPasswd"]').val('');
+	 $('#passwordchange').removeClass('opened');
+});
+
+var cookieLang = $.cookie('language');
+var userLang = navigator.language || navigator.userLanguage;
+var setURL = "";
+var selLang = "";
+
+if (cookieLang == null) {
+	var cookieLang = userLang.substring(0,2);
+}
+
+if (cookieLang == "en") {
+	//setURL = setEng;
+	$("#en").prop("checked",true);
+	//$.cookie('language','en',{expire: '-1',path: '/',domain:'.skku.edu',});
+	$.cookie('language','en');
+	$.cookie('language','en', {domain: '.skku.edu'});
+} else {
+	//setURL = setKor;
+	$("#ko").prop("checked",true);
+	//$.cookie('language','ko',{expire: '-1',path: '/',domain:'.skku.edu',});
+	$.cookie('language','ko');
+	$.cookie('language','ko', {domain: '.skku.edu'});
+}
+
+
+setTimeout(setFocus, 400);
+
+
+$("input[name=lang]").change(function() {
+	$.cookie('language', '');
+	$.cookie('language', '', {domain: '.skku.edu'});
+	
+	if ($("#ko").prop('checked')) {
+		selLang = 'ko';
+		//setURL = setKor;
+	} else {
+		selLang = 'en';
+		//setURL = setEng;
+	}
+	 
+	//$.cookie('language',selLang,{expire: '-1',path: '/',domain:'.skku.edu'});
+	//$.cookie('language',selLang,{expire: '-1',path: '/',domain:'.skku.edu'});
+	$.cookie('language', selLang);
+	$.cookie('language', selLang, {domain: '.skku.edu'});
+	//top.location.href = setURL;
+	
+	location.href = location.href.replace('&lang=ko', '').replace('&lang=en', '');  //location.reload(true);
+});
+
+
+function setId() {
+ 	if (!$('.loginForm .checkBox input:checked').length) {
+		//$("saveid").attr("checked","true");
+		console.log('O')
+	} else {
+		//$("#saveid").attr("checked","false");
+		console.log('X')
+	}
+};
+
+function setFocus() {
+	var loginIdRemember = $.cookie("loginMemberId");
+	if (isEmpty(loginIdRemember)) {
+		$('#userid').focus();
+	}else {
+		$('#userid').val($.cookie("loginMemberId"));
+		$('#saveid').attr("checked", true);
+		$('#userpwd').focus();
+	}
+
+}
+
+function isEmpty(str){
+	if(typeof str == "undefined" || str == null || str == "")
+		return true;
+     else
+         return false;
+}
+
+function newOpenBrowser(targetUrl) {
+	userwidth = (screen.width - 10);
+	userheight = (screen.height - 200); 
+	features="toolbar=yes,scrollbars=yes,location=yes,status=yes,menubar=no,directories=no,resizable=yes,height="+userheight+",width="+userwidth+",left=360,top=190";
+	window.open(targetUrl, "", features);
+}
+
+//var REG_SERVER='https://admin.skku.edu';
+
+// 성균인가입
+function fnInsertPage() {
+    var winName = "popupInsertWin";
+    window.open("",winName,"width=900,height=900,top=0,left=0,scrollbars=yes,resizable=yes");
+    //document.loginFormHidden.method.value = "insertInit";
+    document.loginFormHidden.language.value = $.cookie('language');
+    document.loginFormHidden.target = winName;
+    document.loginFormHidden.action = "/member/join01";
+    document.loginFormHidden.submit(); 
+    //parent.close();
+}
+
+// ID찾기
+function fnFindPage() {
+    var winName = "popupFindWin";
+    window.open("",winName,"width=900,height=900,top=0,left=0,scrollbars=yes,resizable=yes");    
+    //document.loginFormHidden.method.value = "findMain";
+	document.loginFormHidden.language.value =$.cookie('language');       
+	document.loginFormHidden.target = winName;
+	document.loginFormHidden.action = "/member/findId_main";
+	document.loginFormHidden.submit(); 
+    //parent.close(); 
+}
+
+// PW찾기
+function fnPWFindPage() {
+    var winName = "popupFindWin";
+    window.open("",winName,"width=900,height=900,top=0,left=0,scrollbars=yes,resizable=yes");    
+    //document.loginFormHidden.method.value = "findPWMain";
+    document.loginFormHidden.language.value =$.cookie('language');   
+    document.loginFormHidden.target = winName;
+    document.loginFormHidden.action = "/member/findPwd_main";
+    document.loginFormHidden.submit(); 
+    //parent.close(); 
+}
+ 
+// 성균인탈퇴
+function fnRetire() {
+    var winName = "popupRetireWin";
+    window.open("",winName,"width=900,height=900,top=0,left=0,scrollbars=no,resizable=no");
+    //document.loginFormHidden.method.value = "deleteMain";
+    document.loginFormHidden.language.value =$.cookie('language');   
+    document.loginFormHidden.target = winName;
+    document.loginFormHidden.action = "/member/leave_main";
+    document.loginFormHidden.submit(); 
+    //parent.close();
+}
+
+// Internet Explorer 버전 체크
+var IEVersionCheck = function() {
+
+     var word;
+     var version = "N/A";
+
+     var agent = navigator.userAgent.toLowerCase();
+     var name = navigator.appName;
+
+      // IE old version ( IE 10 or Lower )
+     if ( name == "Microsoft Internet Explorer" ) {
+    	 word = "msie ";
+    	 //alert("IE old version under IE10");
+     } else {
+         
+         if (agent.search("trident") > -1 ) {
+        	// IE 11
+        	 word = "trident/.*rv:";
+        	 //alert("IE 11");
+         } else if (agent.search("edge/") > -1 ) {
+             // IE 12  ( Microsoft Edge )
+        	 word = "edge/";
+        	 //alert("IE Edge");
+         } else {
+        	 //그외 브라우져 케이스
+         }
+     }
+
+
+     var reg = new RegExp( word + "([0-9]{1,})(\\.{0,}[0-9]{0,1})" );
+     if (reg.exec( agent ) != null  ){
+    	 version = RegExp.$1 + RegExp.$2;
+    	 //alert("version = "+version);
+     }
+
+   
+     //return version;
+     if (version < 10) {
+        if (confirm('인터넷 익스플로러 10 버전 이상 또는 크롬 브라우저에 최적화되어 있습니다.')) {
+            //location.href = "https://support.microsoft.com/ko-kr/help/17621/internet-explorer-downloads";
+        }
+     }
+
+};
+
+IEVersionCheck();
+
+
+function showErrorAlert(msgText, ssoCode) {
+	if (ssoCode) {
+		$('.sso-code').html("(error code: " + ssoCode + ")");	
+	}
+	
+	$('#defaultmodalbody').html(msgText);
+	$('#defaultalert').addClass('opened');
+	
+	$('#btn_ingresar').focus();
+}
+
+
+//로그인 성공 시 리다이렉트
+function redirectUrl(returnUrl) {
+	//document.location.href = returnUrl;
+	var tmpToken = $.cookie('pToken');
+	sessionStorage.setItem("pToken", tmpToken);
+
+	var hiddenField = document.createElement("input");
+	hiddenField.setAttribute("type", "hidden");
+	hiddenField.setAttribute("name", "tmpToken");
+	hiddenField.setAttribute("value", tmpToken);
+	document.testForm1.appendChild(hiddenField);
+
+	document.testForm1.action = returnUrl;
+	document.testForm1.submit();
+}
+
+
+//비밀번호 변경 팝업
+function pwdChangeModalAlert(pwdChangeDays) {
+	$('#passwordchange').addClass('opened');
+}
+//비밀번호 변경 팝업 - 확인 버튼
+function pwdChangeBtnClick() {
+	
+	var formValuesJson = $("#pwdChangeForm").serializeJSON();
+	
+	var userId = $('#userid').val();
+	var userPasswd = JSON.parse(formValuesJson).userPasswd;
+	var newUserPasswd = JSON.parse(formValuesJson).newUserPasswd;
+	var newReUserPasswd = JSON.parse(formValuesJson).newReUserPasswd;
+	
+	// validation
+	if (gfnPortalTrim(userPasswd) == '') {
+		alert('현재 비밀번호를 입력하여 주십시오.');
+		document.pwdChangeForm.userPasswd.focus();
+		return;
+	} 
+	if (gfnPortalTrim(newUserPasswd) == '') {
+		alert('새로운 비밀번호를 입력하여 주십시오.');
+		document.pwdChangeForm.newUserPasswd.focus();
+		return;
+	}
+	
+    if (gfnPortalTrim(newUserPasswd).indexOf(userId) > -1) {
+        alert('비밀번호에 아이디를 포함할 수 없습니다.');
+        document.pwdChangeForm.newUserPasswd.focus();
+        return;
+    }
+	
+	
+	if (gfnPortalTrim(newReUserPasswd) == '') {
+		alert('재확인 비밀번호를 입력하여 주십시오.');
+		document.pwdChangeForm.newReUserPasswd.focus();
+		return;
+	}	
+	
+	if (!fn_pw_check(newUserPasswd, userId)) {
+		alert('비밀번호 생성 규칙을 준수해 주시기 바랍니다.');
+		document.pwdChangeForm.newUserPasswd.focus();
+		return;
+	}
+	if (newUserPasswd == userPasswd) {
+		alert('기존 비밀번호와 신규 비밀번호가 같습니다. 신규 비밀번호를 다시 등록하세요.');
+		document.pwdChangeForm.newUserPasswd.focus();
+		return;
+	}
+	if (newUserPasswd != newReUserPasswd) {
+		alert('새 비밀번호와 재확인 비밀번호가 일치하지 않습니다.');
+		document.pwdChangeForm.newReUserPasswd.focus();
+		return;
+	}
+	
+	var formJson =  JSON.parse(formValuesJson);
+	formJson.userPasswd = btoa(userPasswd);
+	formJson.newUserPasswd = btoa(newUserPasswd);
+	formJson.newReUserPasswd = btoa(newReUserPasswd);
+	
+	if (userPasswd.trim() !== "" && newUserPasswd.trim() !=="" ) {
+		
+		$.ajax({
+			type: "POST",
+			url: "member/updatePassword",
+			data: JSON.stringify(formJson),
+			dataType: "JSON",
+			contentType: 'application/json', //VO 가 아닌 Map 으로 받을 때 필수
+			success: function(data) {
+				console.log('success');
+				changeResultMsg(data);
+			},
+			error: function() {
+				console.log('error');
+			},
+			complete: function() {
+			}
+		});
+		
+	}
+}
+
+function changeResultMsg(data) {
+	
+	
+	if (!data) {
+		//알 수 없는 오류가 발생하였습니다.
+		alert('알 수 없는 오류가 발생하였습니다.');
+		return;
+	}
+	
+	//비밀번호 변경 성공
+	if (data.retValue == 1) {
+		
+		document.pwdChangeForm.userPasswd.value = "";
+		document.pwdChangeForm.newUserPasswd.value = "";
+		document.pwdChangeForm.newReUserPasswd.value = "";
+		
+		//성공. 모달창 닫고 새로 로그인 하라는 메시지 창 띄워줌
+		$('#passwordchange').removeClass('opened');
+		showErrorAlert('비밀번호를 변경하였습니다. 다시 로그인 해주세요.<br/><br/>※ 비밀번호를 저장/활용하는 서비스(무선 Wi-Fi 등)는 변경된 비밀번호로 재설정해 주시기 바랍니다.');
+		return;
+	}
+	
+	//비밀번호 변경 실패
+	if (data.retValue == -1) {
+		//비밀번호 변경 실패
+		alert('비밀번호 변경에 실패하였습니다.');
+		return;
+	}
+	
+	//비밀번호 생성규칙에 위배
+	if (data.retValue == -2) {
+		
+		document.pwdChangeForm.newUserPasswd.value = "";
+		document.pwdChangeForm.newReUserPasswd.value = "";
+		
+		alert('비밀번호 생성 규칙을 준수해 주시기 바랍니다.');
+		return;
+	}
+	
+	// 신규추가 START
+	// 2020/04/01 : 입력한 비밀번호가 동일한지 확인하여 동일하지 않은 경우에 대한 처리
+	if (data.retValue == -3) {
+		alert('입력한 현재 비밀번호가 상이하여 비밀번호를 변경할 수 없습니다.');
+		return;
+	}
+	// 신규추가 END
+	
+}
+
+
+
+//비밀번호 사용기한(6개월) 만료 안내 팝업
+function pwdExpireDateModalAlert(pwdChangeDays) {
+	$('#expiredpwdalert').addClass('opened');
+}
+//비밀번호 사용기한(6개월) 만료 안내 팝업 - 확인 버튼
+function expireMsgAlertBtnClick() {
+	redirectUrl(this.returnUrl);
+}
+
+
+//로그인 결과 처리
+function loginResultMsg(data) {
+	
+	if(data["ERROR_KEY"] == "error-0010") {
+		showErrorAlert('해외 로그인 차단<br/>본 계정은 이용자에 의해서<br/>해외 로그인 차단으로 설정되었습니다.<br/>(차단/해제 설정 : 포털 > (우측 상단) 내정보)<br/><br/>문의사항<br/>☎ 031-299-6119(내선 6119)<br/>▶ itservice@skku.edu');
+		return;
+	}
+	
+	//비밀번호 변경 기한 만료 -> 비밀번호 사용기한 만료 안내
+	if (data.ssoReturnCode == 2) {
+		
+		if (data.pwdChangeDays > 365) {
+			
+			$('#pwdchgpastday').html(data.pwdChangeDays); //변경 후 경과일
+			
+			//비밀번호 변경 팝업 띄움
+			pwdChangeModalAlert(data.pwdChangeDays);
+		} else {
+			
+			this.returnUrl = data.returnUrl;
+			
+			$('#pwdpastday').html(data.pwdChangeDays); //변경 후 경과일
+			$('#pwdremainday').html(365 - Number(data.pwdChangeDays)); //만료까지 남은 날짜
+			
+			//비밀번호 사용기한(6개월) 만료 안내 팝업 띄움
+			pwdExpireDateModalAlert(data.pwdChangeDays);
+		}
+		
+	} else {
+		
+		if (data.returnCode == "success" && data.returnUrl != "") {
+			redirectUrl(data.returnUrl); //로그인 사이트로 리다이렉트
+		}
+		
+	}
+	
+	
+	if (data.returnCode !== "success" && data.ssoReturnCode < 0 ) {
+		
+		var errorCode = "";
+		var ssoCode = "";
+		
+		if (data.ERROR_KEY.indexOf('error-') == 0) {
+			errorCode = "login.error." + data.ERROR_KEY.split('-')[1];
+		} else {
+			errorCode = "login.error.common";
+			ssoCode = data.ERROR_KEY;
+		}
+		
+		switch (errorCode) {
+			case "login.error.0002":
+				msgText = errMsg0002;
+				break;
+			case "login.error.0003":
+				msgText = errMsg0003;
+				break;
+			case "login.error.0007":
+				msgText = errMsg0007;
+				break;
+			case "login.error.0010":
+				msgText = errMsg0010;
+				break;
+			case "login.error.0011":
+				msgText = errMsg0011;
+				break;
+			case "login.error.0012":
+				msgText = errMsg0012;
+				break;
+			case "login.error.0015":
+				msgText = errMsg0015;
+				break;
+			case "login.error.0016":
+				msgText = errMsg0016;
+				break;
+			default:
+				msgText = errMsgCommon;
+		}
+		
+		showErrorAlert(msgText, ssoCode);
+		
+	}
+	
+}
+
+</script>
+
+<form name="loginFormHidden" method="post">
+	<input type=hidden name=method>
+	<input type=hidden name=retPage>
+	<input type=hidden name=language>
+	<input type=hidden name=userInfo value="">
+	<input type=hidden name=roundkey value="">
+	<input type=hidden name=D1 value="">
+	<input type=hidden name=D3 value="">
+	<input type=hidden name=type value="">
+	<input type=hidden name=sessionYn value="Y">
+	<input type=hidden name=BIZ value="">
+	<input type=hidden name=SKEY value="">
+	<input type=hidden name=reqType value="">
+</form>
+<form name="testForm1" method="post">
+	<input type=hidden name=retPage value="xxx">
+	<input type=hidden name=uid value="">
+
+</form>
+
+<script type="text/javascript">
+
+/*
+//이전 URL 과 해당 retUrl 코드와 매핑된 URL 비교 후 다르면 튕겨내는 부분 
+if (document.referrer == "" || document.referrer.indexOf("")) < 0) {
+    document.loginFormHidden.action = "noAuthority";
+    document.loginFormHidden.submit(); 
+}
+*/
+
+
+//로그인 실행
+function loginBtnClick() {
+	var me = this;
+	//아이디 trim 처리
+	$('#userid').val($('#userid').val().trim());
+	
+	var formValuesJson = $("#LoginForm").serializeJSON();
+	
+	var uid = JSON.parse(formValuesJson).userid;
+	var upw = JSON.parse(formValuesJson).userpwd;
+	
+	$('#userid').blur();
+	
+	if (uid.trim() == "") {
+		showErrorAlert('아이디를 입력하세요.');
+		$('#userid').focus();
+		return;
+	}
+	
+	if (upw.trim() == "") {
+		showErrorAlert('비밀번호를 입력하세요.');
+		$('#userpwd').focus();
+		return;
+	}
+
+	var formJson =  JSON.parse(formValuesJson);
+	formJson.userpwd = btoa(upw);
+	
+	if($("input:checkbox[id='saveid']").is(":checked") == true ){
+		$.cookie("loginMemberId", $('#userid').val(), {expires: new Date(2100, 12, 31, 23, 00, 00),path: "/", domain: ".skku.edu"});
+	}else{
+		$.removeCookie("loginMemberId",{expires: new Date(2100, 12, 31, 23, 00, 00),path: "/", domain: ".skku.edu"});
+	}	
+
+	if (uid.trim() !== "" && upw.trim() !=="" ) {
+		
+		$.ajax({
+			type: "POST",
+			url: "loginAction",
+			data: JSON.stringify(formJson),
+			dataType: "JSON",
+			contentType: 'application/json', //VO 가 아닌 Map 으로 받을 때 필수
+			success: function(data) {
+				console.log('success');
+				loginResultMsg(data);
+			},
+			error: function() {
+				console.log('error');
+			},
+			complete: function() {
+			}
+		});
+		
+	}
+
+}
+
+</script>
+
+</body>
 </html>
