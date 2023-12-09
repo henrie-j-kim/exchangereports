@@ -16,23 +16,27 @@
 	<title>교환학생 똑똑하게 준비하자, 스꾸던트</title>
 </head>
 <body>
-<div id="Wrap">
+    <h1>Download Documents</h1>
 
-<div id="main_header">
-	<h1 class="main_logo"></h1>
-	<!--영문로고
-	<h1 class="main_logo_eng"></h1>
-	-->
-</div>
-	<button onclick="downloadDocument()">Download Document</button>
-	<script>
+    <!-- 버튼 클릭 시 다운로드 이벤트 호출 -->
+
+    <button onclick="downloadDocument('rep2.doc')">Download Document 2</button>
+    <button onclick="downloadDocument('rep3.doc')">Download Document 3</button>
+    <button onclick="downloadDocument('rep4.doc')">Download Document 4</button>
+    <button onclick="downloadDocument('rep5.doc')">Download Document 5</button>
+
+    <script>
         // 문서 다운로드 함수
-        function downloadDocument() {
-            var documentPath = 'path/to/your/document.doc';
+        function downloadDocument(filename) {
+            // 문서 파일의 경로
+            var documentPath = 'path/to/your/documents/' + filename;
+
+            // 가상 링크(a 태그) 생성
             var link = document.createElement('a');
+
             // 링크 속성 설정
             link.href = documentPath;
-            link.download = 'document.doc'; // 다운로드될 파일 이름
+            link.download = filename; // 다운로드될 파일 이름
 
             // 문서를 다운로드하기 위해 클릭 이벤트 발생
             document.body.appendChild(link);
@@ -42,10 +46,5 @@
             document.body.removeChild(link);
         }
     </script>
-
-
-
-
-
-	
-</div>
+</body>
+</html>
