@@ -27,26 +27,33 @@
 
 <div id="main_container">
 	<!--login_form-->
-	<form method="POST" action="loginAction" name="LoginForm" id="LoginForm">
-	<div class="login_form">
-		<div class="login_area">
-			<div class="id_area">
-				<label for="userid" class="sp_img">아이디</label>
-				<input type="text" id="userid" name="userid" placeholder="아이디를 입력하세요." />
-			</div>
-			<div class="pw_area"><label for="userpw" class="sp_img">비밀번호</label>
-				<input type="password" id="userpwd" name="userpwd" placeholder="비밀번호를 입력하세요." />
-			</div>
-			<div class="login_chk login_chk input_sp_img">
-				<input type="checkbox" id="saveid" name="saveid"/>
-				<label for="saveid" class="sp_img">ID 저장</label>
-			</div>
-		</div>
-		<button type="button" id="loginBtn" class="login_btn" onClick="loginBtnClick()">
-			<span>로그인</span>
-		</button>
-		<!--p style="margin: 0 0 20px 0; text-align: center; color: #FF5722; line-height: 150%;">로그인 오류시에는 모든 브라우저 창을 닫으시고,<br/>새 창에서   http://eportal.skku.edu 로 접속하시면 됩니다.</p-->
+	<div class="form-floating mb-3">
+		<input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+		<label for="floatingInput">Email address</label>
 	</div>
-	</form>
+	<div class="form-floating">
+		<input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+		<label for="floatingPassword">Password</label>
+	</div>
 	<!--//login_form-->
+	<div class="input-group mb-3">
+		<span class="input-group-text">국가</span>
+		<div class="form-floating">
+			<input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
+			<label for="floatingInputGroup1">Which country?</label>
+		</div>
+	</div>
+	<div class="input-group mb-3">
+		<span class="input-group-text">학교명</span>
+		<div class="form-floating">
+			<input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
+			<label for="floatingInputGroup1">Which university?</label>
+		</div>
+	</div>
+	<button type="button" class="btn btn-primary">Subscribe</button>
+
+
+
+
+	
 </div>
